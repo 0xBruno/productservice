@@ -1,3 +1,3 @@
-module github.com/0xBruno/go_microservices
+module microservices
 
 go 1.19

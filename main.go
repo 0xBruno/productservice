@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/0xBruno/go_microservices/handlers"
+	"microservices/handlers"
 )
 
 
@@ -20,15 +20,18 @@ func main(){
 	l := log.New(os.Stdout, "LOG:", log.LstdFlags)
 
 	// Create handlers
-	hIndex := handlers.NewIndex(l)
-	hGoodbye := handlers.NewGoodbye(l)
-	hProducts := handlers.NewProducts(l)
+	hIndex		:= handlers.NewIndex(l)
+	hPing 		:= handlers.NewPing()
+	hGoodbye 	:= handlers.NewGoodbye(l)
+	hProducts	:= handlers.NewProducts(l)
 
 	// Create a new serve mux & register handlers 
 	sm := http.NewServeMux()
 	sm.Handle("/", hIndex)
+	sm.Handle("/ping", hPing)
 	sm.Handle("/goodbye", hGoodbye)
-	sm.Handle("/products", hProducts)
+	sm.Handle("/products/", hProducts)
+
 	
 	// Configure server 
 	s := &http.Server{
@@ -40,7 +43,8 @@ func main(){
 	}
 	
 	// Start the server
-	go func(){ 
+	go func(){
+		fmt.Printf("[*] HTTP Server started at %s\n", s.Addr)
 		err := s.ListenAndServe()
 
 		if err != nil {
@@ -54,7 +58,7 @@ func main(){
 	signal.Notify(sigChan, syscall.SIGTERM)
 	
 	sig := <- sigChan
-	fmt.Println("Received terminate, graceful shutdown", sig)
+	fmt.Println("\r\nReceived terminate, graceful shutdown", sig)
 
 	// Ensure request completes within 30 seconds
 	timeCtx, cancel := context.WithTimeout(context.Background(), 30 * time.Second)

@@ -22,7 +22,6 @@ func (i* Index) ServeHTTP(resp http.ResponseWriter, req *http.Request){
 	
 	// Read the body 
 	d, err := ioutil.ReadAll(req.Body)
-	sData := string(d)
 
 	if err != nil {
 		http.Error(resp, "Oops", http.StatusBadRequest)
@@ -31,6 +30,5 @@ func (i* Index) ServeHTTP(resp http.ResponseWriter, req *http.Request){
 	}
 	// Write the response 
 	resp.Write(d)
-	i.l.Println(sData)
 
 }
