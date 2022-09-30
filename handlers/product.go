@@ -1,110 +1,81 @@
 package handlers
 
 import (
-	"log"
-	"microservices/data"
-	"microservices/utils"
 	"net/http"
-	"regexp"
+	"productservice/data"
 	"strconv"
+
+	"github.com/gin-gonic/gin"
 )
 
-type Products struct {
-	l *log.Logger
+func GetProducts(c *gin.Context) {
+	productsList := data.GetProducts()
+	c.JSON(http.StatusOK, productsList)
 }
 
-func NewProducts(l *log.Logger) *Products {
-	return &Products{l}
-}
-
-func (p *Products) ServeHTTP(resp http.ResponseWriter, req *http.Request) {
-
-	if req.Method == http.MethodGet {
-		utils.Log("", req)
-		p.getProducts(resp, req)
-		return
-
-	} else if req.Method == http.MethodPost {
-		utils.Log("", req)
-		p.addProduct(resp, req)
-		return
-	} else if req.Method == http.MethodPut {
-
-		utils.Log("", req)
-
-		reg := regexp.MustCompile(`/([0-9]+)`)
-		g := reg.FindAllStringSubmatch(req.URL.Path, -1)
-
-		if len(g) != 1 {
-			utils.Log("Invalid URI more than one id", req)
-			http.Error(resp, "Invalid URI", http.StatusBadRequest)
-			return
-		}
-
-		if len(g[0]) != 2 {
-			utils.Log("Invalid URI more than one capture group", req)
-			http.Error(resp, "Invalid URI", http.StatusBadRequest)
-			return
-		}
-
-		idString := g[0][1]
-		id, err := strconv.Atoi(idString)
-
-		if err != nil {
-			utils.Log("Invalid URI unable to convert to numer", req)
-			http.Error(resp, "Invalid URI", http.StatusBadRequest)
-			return
-		}
-		
-		p.updateProduct(id, resp, req)
-		return 
-		
-	}
-	
-	resp.WriteHeader(http.StatusMethodNotAllowed)
-}
-
-
-func (p *Products) updateProduct(id int, resp http.ResponseWriter, req *http.Request) {
+func PostProduct(c *gin.Context) {
 	prod := &data.Product{}
 
-	err := prod.FromJSON(req.Body)
-	
+	err := prod.FromJSON(c.Request.Body)
 
 	if err != nil {
-		http.Error(resp, "Unable to unmarshal JSON", http.StatusBadRequest)
-		return
-	}
-
-	err = data.UpdateProduct(id, prod)
-
-	if err == data.ErrProductNotFound {
-		http.Error(resp, "Product not found", http.StatusNotFound)
-		return
-	}
-
-	if err != nil {
-		http.Error(resp, "Error", http.StatusInternalServerError)
-		return
-	}
-
-}
-
-func (p *Products) addProduct(resp http.ResponseWriter, req *http.Request) {
-
-	prod := &data.Product{}
-
-	err := prod.FromJSON(req.Body)
-
-	if err != nil {
-		http.Error(resp, "Unable to unmarshal JSON", http.StatusBadRequest)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to add product"})
 	}
 
 	data.AddProduct(prod)
-
 }
 
-func (p *Products) getProducts(resp http.ResponseWriter, req *http.Request) {
-	productsList := data.GetProducts()
-	productsList.ToJSON(resp)
+func PutProduct(c *gin.Context) {
+
+	// validate route param
+	stringId := c.Param("productId")
+
+	id, err := strconv.Atoi(stringId)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "product id is invalid"})
+		return
+	}
+
+	// validate req body Product obj
+	prod := &data.Product{}
+
+	err = prod.FromJSON(c.Request.Body)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unable to unmarshal json"})
+		return
+	}
+
+	// update product
+	err = data.UpdateProduct(id, prod)
+
+	if err == data.ErrProductNotFound {
+		c.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
+		return
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
+		return
+	}
+}
+
+func DeleteProduct(c *gin.Context) {
+	// validate route param is int
+	stringId := c.Param("productId")
+
+	id, err := strconv.Atoi(stringId)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "product id is invalid"})
+		return
+	}
+
+	err = data.DeleteProduct(id)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+	}
+
 }

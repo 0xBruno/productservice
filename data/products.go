@@ -87,6 +87,32 @@ func AddProduct(p *Product){
 	productList = append(productList, p)
 }
 
+func DeleteProduct(id int) error { 
+	newProductList := []*Product{}
+
+	var productFound bool
+	// Iterate over productList, if ID does not match 
+	// add to newProductList. After looping set productList 
+	// to newProductList productFound flag set to return error 
+	// if not found
+	for _, prod := range productList {
+		if prod.ID == id {
+			productFound = true
+
+		} else {
+			newProductList = append(newProductList, prod)
+		}
+	}
+
+	if !productFound { 
+		return fmt.Errorf("product not found")
+	}
+
+	productList = newProductList
+
+	return nil 
+}
+
 func getNextID() int  {
 	lp := productList[len(productList) - 1]
 	return lp.ID + 1 

@@ -2,19 +2,12 @@ package handlers
 
 import (
 	"net/http"
-	"microservices/utils"
-	
+
+	"github.com/gin-gonic/gin"
 )
 
-type Ping struct {
+func GetPing(c *gin.Context){
+	
+	c.JSON(http.StatusOK, gin.H{"ping":"pong"})
 
-}
-
-func NewPing() *Ping {
-	return &Ping{}
-}
-
-func (p* Ping) ServeHTTP(resp http.ResponseWriter, req *http.Request){
-	utils.Log("",req)
-	resp.Write([]byte("OK\r\n"))
 }
