@@ -15,9 +15,11 @@ func GetProducts(c *gin.Context) {
 
 func PostProduct(c *gin.Context) {
 
-	prod, _  := c.Get("payload")
+	p, _  := c.Get("payload")
 
-	data.AddProduct(prod.(*data.Product))
+	prod := p.(*data.Product)
+
+	data.AddProduct(prod)
 }
 
 func PutProduct(c *gin.Context) {
@@ -32,15 +34,9 @@ func PutProduct(c *gin.Context) {
 		return
 	}
 
-	// validate req body Product obj
-	prod := &data.Product{}
-
-	err = prod.FromJSON(c.Request.Body)
-
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "unable to unmarshal json"})
-		return
-	}
+	//hacky way of using context and middleware for validation
+	p, _  := c.Get("payload")
+	prod := p.(*data.Product)
 
 	// update product
 	err = data.UpdateProduct(id, prod)
