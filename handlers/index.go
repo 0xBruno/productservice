@@ -7,6 +7,6 @@ import (
 
 func GetIndex(c *gin.Context){
 	
-	c.Writer.Write([]byte("ok\r\n"))
+	c.Writer.Write([]byte("🙏\r\n"))
 
 }
