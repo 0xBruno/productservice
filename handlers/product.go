@@ -14,15 +14,10 @@ func GetProducts(c *gin.Context) {
 }
 
 func PostProduct(c *gin.Context) {
-	prod := &data.Product{}
 
-	err := prod.FromJSON(c.Request.Body)
+	prod, _  := c.Get("payload")
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to add product"})
-	}
-
-	data.AddProduct(prod)
+	data.AddProduct(prod.(*data.Product))
 }
 
 func PutProduct(c *gin.Context) {
