@@ -8,8 +8,6 @@ import (
 
 func initRoutes() {
 
-
-
 	// Wire up routes
 	router.GET("/", handlers.GetIndex)
 	router.GET("/ping", handlers.GetPing)

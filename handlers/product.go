@@ -50,6 +50,8 @@ func PutProduct(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{"msg":" product " + strconv.Itoa(id) + " successfully updated"})
 }
 
 func DeleteProduct(c *gin.Context) {
