@@ -10,9 +10,13 @@ func initRoutes() {
 
 	// Wire up routes
 	router.GET("/", handlers.GetIndex)
-	router.GET("/ping", handlers.GetPing)
-	router.GET("/products", handlers.GetProducts)
-	router.POST("/products", middlewares.ProductValidator(), handlers.PostProduct)
-	router.PUT("/products/:productId", middlewares.ProductValidator(), handlers.PutProduct)
-	router.DELETE("/products/:productId", handlers.DeleteProduct)
+	
+	api := router.Group("/api")
+	{ 
+		api.GET("/ping", handlers.GetPing)
+		api.GET("/products", handlers.GetProducts)
+		api.POST("/products", middlewares.ProductValidator(), handlers.PostProduct)
+		api.PUT("/products/:productId", middlewares.ProductValidator(), handlers.PutProduct)
+		api.DELETE("/products/:productId", handlers.DeleteProduct)
+	}
 }

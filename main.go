@@ -10,7 +10,7 @@ func main(){
 
 	initRoutes()
 	
-	gin.SetMode(gin.ReleaseMode)
+	//gin.SetMode(gin.ReleaseMode)
 	
 	router.Run(":1337")
 }
