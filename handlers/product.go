@@ -14,12 +14,10 @@ func GetProducts(c *gin.Context) {
 }
 
 func PostProduct(c *gin.Context) {
+	
+	product := c.MustGet("product").(data.Product)
+	data.AddProduct(&product)
 
-	p, _  := c.Get("payload")
-
-	prod := p.(*data.Product)
-
-	data.AddProduct(prod)
 }
 
 func PutProduct(c *gin.Context) {
@@ -34,12 +32,10 @@ func PutProduct(c *gin.Context) {
 		return
 	}
 
-	//hacky way of using context and middleware for validation
-	p, _  := c.Get("payload")
-	prod := p.(*data.Product)
+	product := c.MustGet("product").(data.Product)
 
 	// update product
-	err = data.UpdateProduct(id, prod)
+	err = data.UpdateProduct(id, &product)
 
 	if err == data.ErrProductNotFound {
 		c.JSON(http.StatusNotFound, gin.H{"error": "product not found"})

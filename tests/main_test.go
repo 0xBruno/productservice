@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"productservice/handlers"
-	"productservice/middlewares"
 	"strings"
 	"testing"
 
@@ -43,7 +42,7 @@ func TestPostHandler(t *testing.T){
 
 	r := MockRouter()
 
-	r.POST("/products", middlewares.ProductValidator(), handlers.PostProduct)
+	r.POST("/products", handlers.PostProduct)
 
 	req, _ := http.NewRequest("POST", "/products", mockRequest)
 
@@ -61,7 +60,7 @@ func TestPutHandler(t *testing.T){
 	
 	r := MockRouter()
 
-	r.PUT("/products/:productId", middlewares.ProductValidator(), handlers.PutProduct)
+	r.PUT("/products/:productId", handlers.PutProduct)
 
 	req, _ := http.NewRequest("PUT", "/products/1", mockRequest)
 
